@@ -179,7 +179,7 @@ class Auth
         ];
 
         // Prepare the data for URL-encoded POST request
-        $postFields = http_build_query($data);
+        $postFields = http_build_query($data, '', '&', PHP_QUERY_RFC3986);
 
         curl_setopt_array($ch, [
             CURLOPT_URL => $this->baseUrl . '/oauth2/token',
