@@ -7,14 +7,14 @@ use Exception;
 class BirPayException extends Exception
 {
     private string $errorCode;   // Error code as provided in the response
-    private array $details;       // Additional details about the error (if any)
+    private array $responseData;       //response data of api
 
     // Constructor to initialize the error object
-    public function __construct(string $message, string $errorCode = '', array $details = [])
+    public function __construct(string $message, string $errorCode = '', array $responseData = [])
     {
         parent::__construct($message); // Call parent constructor with the message
         $this->errorCode = $errorCode;
-        $this->details = $details;
+        $this->responseData = $responseData;
     }
 
     // Getters for the error properties
@@ -23,9 +23,9 @@ class BirPayException extends Exception
         return $this->errorCode;
     }
 
-    public function getDetails(): array
+    public function responseData(): array
     {
-        return $this->details;
+        return $this->responseData;
     }
 
     // Optional: Method to represent the error as a string

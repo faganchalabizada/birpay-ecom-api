@@ -207,7 +207,15 @@ class Auth
         if ($httpCode === 200) {
             return json_decode($response, true); // Decode JSON response
         } else {
-            throw new BirPayException('Error: ' . $response);
+            $response = json_decode($response, true); // Decode JSON response
+
+            if (!$data) {
+                throw new BirPayException("Invalid json", "invalid_auth_json");
+            }
+
+            $error = $response['error'] ?? 'Undefined auth error.';
+            $desc = $response['error_description'] ?? '';
+            throw new BirPayException($desc, $error);
         }
     }
 

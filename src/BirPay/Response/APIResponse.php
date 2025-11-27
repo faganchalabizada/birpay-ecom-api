@@ -40,7 +40,7 @@ class APIResponse
             $detailedMessage = $detailedMessage == '' ? $errorCode : $detailedMessage;
 
             // Throw a custom exception with the error information
-            throw new BirPayException($detailedMessage, $errorCode);
+            throw new BirPayException($detailedMessage, $errorCode, $responseData);
         }
 
     }

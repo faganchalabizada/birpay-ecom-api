@@ -125,6 +125,7 @@ class BirPay
         // Execute the cURL request and capture the response
         $response = curl_exec($ch);
 
+
         // Check for cURL errors
         if (curl_errno($ch)) {
             // If there is a cURL error, throw an exception or return an error response

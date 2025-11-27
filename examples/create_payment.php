@@ -6,7 +6,7 @@ use FaganChalabizada\BirPay\Enums\ConfirmationType;
 use FaganChalabizada\BirPay\Enums\PaymentMethod;
 use FaganChalabizada\BirPay\Exception\BirPayException;
 
-$birpay = new BirPay();
+$birpay = new BirPay("qq");
 
 try {
 
