@@ -1,0 +1,28 @@
+{
+  "name": "faganchalabizada/birpay-ecom-api",
+  "description": "PHP SDK for BirPay ECOM API (birbank.az)",
+  "type": "library",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Fagan Chalabizada",
+      "email": "feqan@celebizade.info"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "FaganChalabizada\\BirPay\\": "src/BirPay/"
+    }
+  },
+  "archive": {
+    "exclude": ["examples/"]
+  },
+  "minimum-stability": "stable",
+  "require-dev": {
+
+  }
+}
