@@ -25,6 +25,11 @@ class APIResponse
             $errorCode = $this->data['code'] ?? 'UNKNOWN_ERROR';
             $errorMessage = $this->data['message'] ?? 'An unknown error occurred';
 
+            if (isset($this->data['error'])) {
+                $errorCode = $this->data['error'];
+                $errorMessage = $this->data['error_description'] ?? 'An unknown error occurred';
+            }
+
             // Include any validation errors, if available
             $errorDetails = $this->data['errors'] ?? [];
 
