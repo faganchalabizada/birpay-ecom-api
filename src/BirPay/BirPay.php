@@ -27,8 +27,11 @@ class BirPay
 
     private string $baseUrl;
 
-    public function __construct($merchantId = 'E1040009', $terminalId = 'E1040009', $clientId = 'birpay-test', $clientSecret = 'mc8JHRvS9JyaElcj1ozm1Fpd5Gpaj73q', $demo = true)
+    public function __construct($merchantId = 'E1040009', $terminalId = 'E1040009', $clientId = 'birpay-test', $clientSecret = 'mc8JHRvS9JyaElcj1ozm1Fpd5Gpaj73q')
     {
+
+        $demo = ($merchantId == 'E1040009');
+
         $this->baseUrl = $demo ? $this->demoUrl : $this->prodUrl;
         $this->merchantId = $merchantId;
         $this->terminalId = $terminalId;
