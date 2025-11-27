@@ -21,6 +21,10 @@ class CreatePaymentResponse extends APIResponse
      */
     public function getPaymentURL(): ?string
     {
+        if (isset($this->data['confirmation']['confirmUrl'])) {
+            return $this->data['confirmation']['confirmUrl'];
+        }
+
         // Assuming the 'confirmData' inside 'confirmation' contains the payment URL
         return $this->data['confirmation']['confirmData'] ?? null;
     }

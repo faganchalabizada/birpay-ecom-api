@@ -6,13 +6,13 @@ use FaganChalabizada\BirPay\Enums\ConfirmationType;
 use FaganChalabizada\BirPay\Enums\PaymentMethod;
 use FaganChalabizada\BirPay\Exception\BirPayException;
 
-$birpay = new BirPay("qq");
+$birpay = new BirPay();
 
 try {
 
-    $createPayment = $birpay->createPayment("test2", "test payment", PaymentMethod::M10, ConfirmationType::QR, "aa.com", 1);
+    $createPayment = $birpay->createPayment("test2", "test payment", PaymentMethod::M10, ConfirmationType::REDIRECT, "aa.com", 1);
 
-    $data = $createPayment->getRawData();
+    $data = $createPayment->getPaymentURL();
 
     print_r($data);
 
