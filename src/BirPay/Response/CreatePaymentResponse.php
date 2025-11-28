@@ -2,6 +2,8 @@
 
 namespace FaganChalabizada\BirPay\Response;
 
+use FaganChalabizada\BirPay\Enums\PaymentStatus;
+
 class CreatePaymentResponse extends APIResponse
 {
     /**
@@ -32,11 +34,11 @@ class CreatePaymentResponse extends APIResponse
     /**
      * Get the payment status.
      *
-     * @return string|null The payment status, or null if not available.
+     * @return PaymentStatus|null The payment status, or null if not available.
      */
-    public function getPaymentStatus(): ?string
+    public function getPaymentStatus(): ?PaymentStatus
     {
-        return $this->data['status'] ?? null;
+        return PaymentStatus::tryFrom($this->data['payload']['status'] ?? '');
     }
 
     /**

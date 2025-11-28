@@ -2,6 +2,9 @@
 
 namespace FaganChalabizada\BirPay\Response;
 
+use FaganChalabizada\BirPay\Enums\ConfirmationType;
+use FaganChalabizada\BirPay\Enums\PaymentStatus;
+
 class RetrievePaymentResponse extends APIResponse
 {
     /**
@@ -17,11 +20,11 @@ class RetrievePaymentResponse extends APIResponse
     /**
      * Get the payment status (e.g., "canceled", "pending", etc.).
      *
-     * @return string|null The payment status, or null if not available.
+     * @return PaymentStatus|null The payment status, or null if not available.
      */
     public function getPaymentStatus(): ?string
     {
-        return $this->data['status'] ?? null;
+        return PaymentStatus::tryFrom($this->data['status'] ?? '');
     }
 
     /**
@@ -88,11 +91,11 @@ class RetrievePaymentResponse extends APIResponse
     /**
      * Get the confirmation type
      *
-     * @return string|null The confirmation type, or null if not available. qr, mobile, redirect
+     * @return ConfirmationType|null The confirmation type, or null if not available. qr, mobile, redirect
      */
-    public function getConfirmationType(): ?string
+    public function getConfirmationType(): ?ConfirmationType
     {
-        return $this->data['confirmation']['type'] ?? null;
+        return ConfirmationType::tryFrom($this->data['confirmation']['type'] ?? '');
     }
 
 

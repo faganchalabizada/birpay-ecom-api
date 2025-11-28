@@ -2,6 +2,9 @@
 
 namespace FaganChalabizada\BirPay\Response;
 
+use FaganChalabizada\BirPay\Enums\PaymentMethod;
+use FaganChalabizada\BirPay\Enums\PaymentStatus;
+
 class WebhookResponse extends APIResponse
 {
 
@@ -39,22 +42,22 @@ class WebhookResponse extends APIResponse
     /**
      * Get the payment method. birbank, m10, bank_card
      *
-     * @return string|null The payment method, or null if not available.
+     * @return PaymentMethod|null The payment method, or null if not available.
      */
-    public function getPaymentMethod(): ?string
+    public function getPaymentMethod(): ?PaymentMethod
     {
-        return $this->data['payload']['paymentMethod'] ?? null;
+        return PaymentMethod::tryFrom($this->data['payload']['paymentMethod'] ?? '');
     }
 
 
     /**
      * Get the payment status.
      *
-     * @return string|null The payment status, or null if not available.
+     * @return PaymentStatus|null The payment status, or null if not available.
      */
-    public function getPaymentStatus(): ?string
+    public function getPaymentStatus(): ?PaymentStatus
     {
-        return $this->data['payload']['status'] ?? null;
+        return PaymentStatus::tryFrom($this->data['payload']['status'] ?? '');
     }
 
 
