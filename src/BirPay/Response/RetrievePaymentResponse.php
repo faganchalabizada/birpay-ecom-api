@@ -22,7 +22,7 @@ class RetrievePaymentResponse extends APIResponse
      *
      * @return PaymentStatus|null The payment status, or null if not available.
      */
-    public function getPaymentStatus(): ?string
+    public function getPaymentStatus(): ?PaymentStatus
     {
         return PaymentStatus::tryFrom($this->data['status'] ?? '');
     }
