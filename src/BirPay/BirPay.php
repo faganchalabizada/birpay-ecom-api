@@ -27,7 +27,18 @@ class BirPay
 
     private string $baseUrl;
 
-    public function __construct($merchantId = 'E1040009', $terminalId = 'E1040009', $clientId = 'birpay-test', $clientSecret = 'mc8JHRvS9JyaElcj1ozm1Fpd5Gpaj73q')
+    /**
+     * @param string $merchantId
+     * @param string $terminalId
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string $signature Signature secret key to validate webhook requests
+     */
+    public function __construct(string $merchantId = 'E1040009',
+                                string $terminalId = 'E1040009',
+                                string $clientId = 'birpay-test',
+                                string $clientSecret = 'mc8JHRvS9JyaElcj1ozm1Fpd5Gpaj73q',
+                                string $signature = '')
     {
 
         $demo = ($merchantId == 'E1040009');
@@ -36,7 +47,7 @@ class BirPay
         $this->merchantId = $merchantId;
         $this->terminalId = $terminalId;
 
-        $this->auth = new Auth($clientId, $clientSecret, $demo);
+        $this->auth = new Auth($clientId, $clientSecret, $signature, $demo);
     }
 
     /**
@@ -54,11 +65,14 @@ class BirPay
      * Generate a unique idempotency key for each request.
      *
      * @return string The generated idempotency key.
-     * @throws Exception
      */
     private function generateIdempotencyKey(): string
     {
-        return bin2hex(random_bytes(16)); // Generate a unique key (e.g., using random bytes)
+        try {
+            return bin2hex(random_bytes(16));
+        } catch (Exception) {
+            return microtime();
+        }
     }
 
 
@@ -265,7 +279,7 @@ class BirPay
      */
     public function cancelOperation(string $paymentId): CancelPaymentResponse
     {
-        return $this->sendRequest('/v1/payments/' . $paymentId . '/cancel', [], RetrievePaymentResponse::class, 'PUT');
+        return $this->sendRequest('/v1/payments/' . $paymentId . '/cancel', [], CancelPaymentResponse::class, 'PUT');
     }
 
     /**
@@ -275,20 +289,26 @@ class BirPay
     {
 
         // Read raw POST body
-        $payload = file_get_contents('php://input');
+        $content = file_get_contents('php://input');
+
+        // Decode JSON
+        $data = json_decode($content, true);
+
+        if (!$data) {
+            throw new BirPayException("Invalid json", "invalid_webhook_json");
+        }
+
+        $payload = json_encode($data['payload']);
 
         // Signature sent from provider
         $sentSignature = $_SERVER['HTTP_X_SIGNATURE'] ?? '';
 
-        if (!$this->auth()->isValid($payload, $sentSignature)) {
-            throw new BirPayException("Invalid signature", "invalid_signature");
+        if ($this->auth()->getSignature() == '') {
+            throw new BirPayException("Please set signature key for BirPay class.", "empty_signature_key");
         }
 
-        // Decode JSON
-        $data = json_decode($payload, true);
-
-        if (!$data) {
-            throw new BirPayException("Invalid json", "invalid_webhook_json");
+        if (!$this->auth()->isValid($payload, $sentSignature)) {
+            throw new BirPayException("Invalid signature", "invalid_signature");
         }
 
         return new WebhookResponse($data, 200);

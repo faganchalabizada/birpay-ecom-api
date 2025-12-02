@@ -34,8 +34,7 @@ enum ErrorCode: string
 
             self::TOKEN_EXPIRED => "The bearer token is expired.",
 
-            self::UNEXPECTED_PAYMENT_ERROR => "Error occurs due to internal reasons.",
-            self::INTERNAL_SERVER_ERROR => "Error occurs due to internal reasons.",
+            self::UNEXPECTED_PAYMENT_ERROR, self::INTERNAL_SERVER_ERROR => "Error occurs due to internal reasons.",
 
             self::BAD_GATEWAY => "Error occurs due to external reasons.",
 
@@ -57,8 +56,7 @@ enum ErrorCode: string
 
             'token_expired' => "The bearer token is expired.",
 
-            'unexpected_payment_error' => "Error occurs due to internal reasons.",
-            'internal_server_error' => "Error occurs due to internal reasons.",
+            'unexpected_payment_error', 'internal_server_error' => "Error occurs due to internal reasons.",
 
             'bad_gateway' => "Error occurs due to external reasons.",
 

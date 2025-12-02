@@ -2,6 +2,7 @@
 
 namespace FaganChalabizada\BirPay;
 
+use Exception;
 use FaganChalabizada\BirPay\Exception\BirPayException;
 
 class Auth
@@ -12,6 +13,7 @@ class Auth
     private string $baseUrl;
     private string $clientId;
     private string $clientSecret;
+    private string $signature;
     private string $accessToken;
     private string $refreshToken;
     private int $accessTokenExpiresIn = 0;
@@ -22,14 +24,16 @@ class Auth
      *
      * @param string $clientId The client ID for authentication.
      * @param string $clientSecret The client secret for authentication.
+     * @param string $signature Signature secret key to validate webhook requests
      * @param bool $demo
      */
-    public function __construct(string $clientId = 'birpay-test', string $clientSecret = 'mc8JHRvS9JyaElcj1ozm1Fpd5Gpaj73q', $demo = true)
+    public function __construct(string $clientId = 'birpay-test', string $clientSecret = 'mc8JHRvS9JyaElcj1ozm1Fpd5Gpaj73q', string $signature = '', bool $demo = true)
     {
         $this->baseUrl = $demo ? $this->demoUrl : $this->prodUrl;
 
         $this->clientId = $clientId;
         $this->clientSecret = $clientSecret;
+        $this->signature = $signature;
 
         // Start the session if not already started
         if (session_status() === PHP_SESSION_NONE) {
@@ -96,9 +100,6 @@ class Auth
     private function refreshAccessToken(): void
     {
 
-
-        echo "refreshAccessToken";
-
         $data = [
             'grant_type' => 'refresh_token',
             'client_id' => $this->clientId,
@@ -110,17 +111,7 @@ class Auth
         $response = $this->sendRequest($data);
 
         if (isset($response['access_token'])) {
-
-            $this->accessToken = $response['access_token'];
-            $this->refreshToken = $response['refresh_token'] ?? '';
-            $this->accessTokenExpiresIn = time() + ($response['expires_in'] ?? 0); // Set access token expiry time
-            $this->refreshTokenExpiresIn = time() + ($response['refresh_expires_in'] ?? 0); // Set refresh token expiry time
-
-            // Store the tokens in the session
-            $_SESSION['access_token'] = $this->accessToken;
-            $_SESSION['refresh_token'] = $this->refreshToken;
-            $_SESSION['access_token_expires_in'] = $this->accessTokenExpiresIn;
-            $_SESSION['refresh_token_expires_in'] = $this->refreshTokenExpiresIn;
+            $this->storeAccessToken($response);
         } else {
             throw new BirPayException('Failed to refresh access token.');
         }
@@ -145,17 +136,7 @@ class Auth
         $response = $this->sendRequest($data);
 
         if (isset($response['access_token'])) {
-
-            $this->accessToken = $response['access_token'];
-            $this->refreshToken = $response['refresh_token'] ?? '';
-            $this->accessTokenExpiresIn = time() + ($response['expires_in'] ?? 0); // Set access token expiry time
-            $this->refreshTokenExpiresIn = time() + ($response['refresh_expires_in'] ?? 0); // Set refresh token expiry time
-
-            // Store the tokens in the session
-            $_SESSION['access_token'] = $this->accessToken;
-            $_SESSION['refresh_token'] = $this->refreshToken;
-            $_SESSION['access_token_expires_in'] = $this->accessTokenExpiresIn;
-            $_SESSION['refresh_token_expires_in'] = $this->refreshTokenExpiresIn;
+            $this->storeAccessToken($response);
         } else {
             throw new BirPayException('Failed to create access token.');
         }
@@ -220,7 +201,6 @@ class Auth
     }
 
 
-
     /**
      * Creates an HMAC SHA-256 signature for a given payload.
      *
@@ -231,12 +211,15 @@ class Auth
      *
      * @return string The base64-encoded HMAC SHA-256 signature for the given payload.
      *
-     * @throws \Exception If the HMAC generation fails due to invalid algorithm or other errors.
      */
     public function createSignature(string $payload): string
     {
-        // Generate HMAC SHA-256 hash
-        $hash = hash_hmac('sha256', $payload, $this->clientSecret, true);
+        try {
+            // Generate HMAC SHA-256 hash
+            $hash = hash_hmac('sha256', $payload, $this->signature, true);
+        } catch (Exception) {
+            return '';
+        }
         // Return the hash as a base64 encoded string
         return base64_encode($hash);
     }
@@ -252,7 +235,6 @@ class Auth
      *
      * @return bool Returns `true` if the signature is valid, `false` otherwise.
      *
-     * @throws \Exception If there is an error during signature generation or comparison.
      */
     public function isValid(string $payload, string $sentSignature): bool
     {
@@ -263,5 +245,23 @@ class Auth
         return hash_equals($generatedSignature, $sentSignature);
     }
 
-}
+    public function getSignature(): string
+    {
+        return $this->signature;
+    }
 
+    private function storeAccessToken(array $response): void
+    {
+        $this->accessToken = $response['access_token'];
+        $this->refreshToken = $response['refresh_token'] ?? '';
+        $this->accessTokenExpiresIn = time() + ($response['expires_in'] ?? 0); // Set access token expiry time
+        $this->refreshTokenExpiresIn = time() + ($response['refresh_expires_in'] ?? 0); // Set refresh token expiry time
+
+        // Store the tokens in the session
+        $_SESSION['access_token'] = $this->accessToken;
+        $_SESSION['refresh_token'] = $this->refreshToken;
+        $_SESSION['access_token_expires_in'] = $this->accessTokenExpiresIn;
+        $_SESSION['refresh_token_expires_in'] = $this->refreshTokenExpiresIn;
+    }
+
+}
